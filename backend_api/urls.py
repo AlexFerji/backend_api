@@ -7,8 +7,7 @@ from drf_yasg import openapi
 from rest_framework.routers import SimpleRouter
 from rest_framework import permissions
 
-from post_image.views import ImageList
-
+from post_image.views import ImageList, UploadImage
 
 
 schema_view = get_schema_view(
@@ -26,16 +25,20 @@ schema_view = get_schema_view(
 
 
 router = SimpleRouter()
-router.register('image_list', ImageList, basename='ImageList')
+router.register('image_list', ImageList, basename='imagelist')
+router.register('image_list/upload/', UploadImage, basename='upload')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('v1/api-auth/', include('rest_framework.urls')),
-    path('api/v1/dj-rest-auth/', include('dj_rest_auth.urls')),
-    path('api/v1/dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('api/v1/', include('post_image.urls')),
-    path('api/', include(router.urls)),
-    path('swagger', schema_view.with_ui( 'swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc', schema_view.with_ui( 'redoc', cache_timeout=0), name='schema-redoc')
+    path('api/v1/admin/', admin.site.urls),
+    path('api/', include([
+        path('v1/api-auth/', include('rest_framework.urls')),
+        path('v1/dj-rest-auth/', include('dj_rest_auth.urls')),
+        path('v1/dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+        path('v1/', include(router.urls)),
 
+    ])),
+    path('api/', include([
+        path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+        path('redoc', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc')
+    ])),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
