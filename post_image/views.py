@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from rest_framework import viewsets
-from rest_framework import status, generics
+from rest_framework import viewsets, mixins
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Image
@@ -20,14 +20,15 @@ class ImageList(viewsets.ModelViewSet):
 
 
 
-
-class UploadImage(generics.CreateAPIView):
-    serializer_class = ImagePostSerializer
+class UploadImage(mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated,)
+    queryset = Image.objects.all()
+    serializer_class = ImagePostSerializer
     model = Image
 
 
-    def post(self, request, *args, **kwargs):
+
+    def create(self, request, *args, **kwargs):
         serializer_for_image = self.serializer_class(data=request.data)
         serializer_for_image.is_valid(raise_exception=True)
         if serializer_for_image.is_valid():
